@@ -3,7 +3,7 @@ import "./ProductInputForm.css";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const SAMPLE_PRODUCT_IMAGE = "/images/choicell-all-in-one-shampoo.png";
+const SAMPLE_PRODUCT_IMAGE = `${import.meta.env.BASE_URL}images/choicell-all-in-one-shampoo.png`;
 
 const initialValues = {
   productName: "초이셀 올인원 샴푸",
