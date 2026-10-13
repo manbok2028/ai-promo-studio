@@ -12,7 +12,9 @@ export default function App() {
 
     setSubmittedProduct({
       ...product,
-      photoPreviewUrl: URL.createObjectURL(product.photo),
+      photoPreviewUrl: product.photo
+        ? URL.createObjectURL(product.photo)
+        : product.photoUrl,
     });
   };
 

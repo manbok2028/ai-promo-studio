@@ -3,13 +3,15 @@ import "./ProductInputForm.css";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const SAMPLE_PRODUCT_IMAGE = "/images/choicell-all-in-one-shampoo.png";
 
 const initialValues = {
-  productName: "",
-  productDescription: "",
-  targetAudience: "",
-  keyFeatures: "",
-  brandTone: "",
+  productName: "초이셀 올인원 샴푸",
+  productDescription:
+    "두피와 모발을 한 번에 깨끗하게 관리하는 자연 유래 성분의 프리미엄 올인원 샴푸입니다.",
+  targetAudience: "건강한 두피와 모발 관리를 원하는 성인",
+  keyFeatures: "올인원 케어, 자연 유래 성분, 프리미엄 향",
+  brandTone: "natural",
 };
 
 export default function ProductInputForm({ onSubmit }) {
@@ -17,14 +19,14 @@ export default function ProductInputForm({ onSubmit }) {
   const fileInputRef = useRef(null);
   const [values, setValues] = useState(initialValues);
   const [photo, setPhoto] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(SAMPLE_PRODUCT_IMAGE);
   const [errors, setErrors] = useState({});
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
@@ -53,14 +55,14 @@ export default function ProductInputForm({ onSubmit }) {
       return;
     }
 
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
     setPhoto(file);
     setPreviewUrl(URL.createObjectURL(file));
     setErrors((current) => ({ ...current, photo: "" }));
   };
 
   const removePhoto = () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
     setPhoto(null);
     setPreviewUrl("");
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -81,7 +83,7 @@ export default function ProductInputForm({ onSubmit }) {
       nextErrors.productDescription = "제품 설명을 10자 이상 입력해주세요.";
     }
 
-    if (!photo) nextErrors.photo = "제품 사진을 업로드해주세요.";
+    if (!previewUrl) nextErrors.photo = "제품 사진을 업로드해주세요.";
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -101,6 +103,7 @@ export default function ProductInputForm({ onSubmit }) {
         .filter(Boolean),
       brandTone: values.brandTone || "auto",
       photo,
+      photoUrl: photo ? "" : previewUrl,
       status: "INPUT_COMPLETED",
     };
 
@@ -148,7 +151,7 @@ export default function ProductInputForm({ onSubmit }) {
               value={values.productName}
               onChange={updateValue}
               maxLength={50}
-              placeholder="예: 제주 청귤 수제청"
+              placeholder="예: 초이셀 올인원 샴푸"
               aria-invalid={Boolean(errors.productName)}
             />
             <div className="field-meta">
@@ -211,7 +214,7 @@ export default function ProductInputForm({ onSubmit }) {
               name="keyFeatures"
               value={values.keyFeatures}
               onChange={updateValue}
-              placeholder="예: 제주산 원료, 무첨가, 선물용 (쉼표로 구분)"
+              placeholder="예: 올인원 케어, 자연 유래 성분, 프리미엄 향 (쉼표로 구분)"
             />
           </div>
 
@@ -252,8 +255,12 @@ export default function ProductInputForm({ onSubmit }) {
               <div className="photo-preview">
                 <img src={previewUrl} alt="업로드한 제품 미리보기" />
                 <div>
-                  <strong>{photo?.name}</strong>
-                  <small>{(photo.size / 1024 / 1024).toFixed(2)}MB</small>
+                  <strong>{photo?.name || "초이셀 올인원 샴푸 샘플 이미지"}</strong>
+                  <small>
+                    {photo
+                      ? `${(photo.size / 1024 / 1024).toFixed(2)}MB`
+                      : "프로젝트 기본 제품 이미지"}
+                  </small>
                   <button type="button" onClick={removePhoto}>사진 삭제</button>
                 </div>
               </div>
